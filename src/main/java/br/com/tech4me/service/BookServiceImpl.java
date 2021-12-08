@@ -2,10 +2,14 @@ package br.com.tech4me.service;
 
 import br.com.tech4me.model.Book;
 import br.com.tech4me.repository.BooksRepository;
+import br.com.tech4me.view.shared.BookDataTransfer;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class BookServiceImpl implements BookService {
@@ -14,13 +18,16 @@ public class BookServiceImpl implements BookService {
     private BooksRepository repository;
 
     @Override
-    public List<Book> getAllBooks() {
-        return repository.findAll();
+    public List<BookDataTransfer> getAllBooks() {
+        List<Book> books = repository.findAll();
+        return books.stream()
+                .map(b -> new ModelMapper().map(b, BookDataTransfer.class))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Book getBookById(String id) {
-        return repository.findById(id).get();
+    public Optional<Book> getBookById(String id) {
+        return repository.findById(id);
     }
 
     @Override
